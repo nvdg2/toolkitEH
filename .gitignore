@@ -1,1 +1,3 @@
-.venv
+/nmap
+/.venv
+/__pycache__
