@@ -29,3 +29,7 @@ def navigate(table: AdvancedTable):
             table.activate_function()
         elif keyboard.is_pressed("q"):
             exit()
+            
+def set_value(variable):
+    value=input("Geef waarde op: ")
+    variable=value

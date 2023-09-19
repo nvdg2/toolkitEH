@@ -6,10 +6,10 @@ import json
 import pathlib
 from datetime import datetime
 from advancedTable import AdvancedTable
-from ui import navigate
-
-ip_adress="127.0.0.1"
-portlist=[22,23,24,25,26]
+from ui import navigate, set_value
+ 
+targetIp = ""
+port_range= ""
 def load():
     navigate(create_nmap_modes_table())
 
@@ -25,7 +25,27 @@ def create_nmap_modes_table():
     table.add_row("Ping scan", "Een ping scan uitvoeren op een reeks van hosts")
     
     functions = [
-        
+        lambda: navigate(create_scan_hosts_table())
+    ]
+
+    advancedTable = AdvancedTable(table, functions)
+    return advancedTable
+
+def create_scan_hosts_table(target_ip="empty", port_range="empty"):
+    title = Text("Pentesting tool - Nmap - scan host ports")
+    title.stylize("bold red")
+    table = Table(title=title, style="red")
+
+    table.add_column("Setting", justify="left", style="bold white", no_wrap=True)
+    table.add_column("Info", style="magenta")
+    table.add_column("value", style="magenta")
+
+    table.add_row("Ip adress", "Het adres van de target host",target_ip)
+    table.add_row("Ports", "De range van poorten. Mogelijke layout: '24,25,44-50,8080'",port_range)
+
+
+    functions = [
+        lambda: navigate(create_scan_hosts_table(input("test"),"test"))
     ]
 
     advancedTable = AdvancedTable(table, functions)
@@ -50,8 +70,11 @@ def parse_port_range(port_range):
 
 
 def scan_hosts_for_open_ports():
+    ip_adress="127.0.0.1"
+    portlist=[22,23,24,25,26]
     scan_results_short={}
     scan_results_raw={}
+    
     for port in portlist:
         scan=nmap.PortScanner().scan(ip_adress,str(port))
         state=scan["scan"][ip_adress]["tcp"][port]["state"]
