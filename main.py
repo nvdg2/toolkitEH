@@ -25,8 +25,8 @@ def create_modes_table():
     ]
 
     advancedTable = AdvancedTable(table, functions)
-    return advancedTable
+    navigate(advancedTable)
 
 if __name__ == "__main__":
-    navigate(create_modes_table())
+    create_modes_table()
 

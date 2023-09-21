@@ -1,17 +1,17 @@
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
-import nmap
 import json
 import pathlib
 from datetime import datetime
 from advancedTable import AdvancedTable
 from ui import navigate, set_value
- 
+import ipaddress
+
 targetIp = ""
 port_range= ""
 def load():
-    navigate(create_nmap_modes_table())
+    scan_ip_hosts("192.168.2.0/24")
 
 def create_nmap_modes_table():
     title = Text("Pentesting tool - Nmap")
@@ -25,11 +25,11 @@ def create_nmap_modes_table():
     table.add_row("Ping scan", "Een ping scan uitvoeren op een reeks van hosts")
     
     functions = [
-        lambda: navigate(create_scan_hosts_table())
+        create_scan_hosts_table
     ]
 
     advancedTable = AdvancedTable(table, functions)
-    return advancedTable
+    navigate(advancedTable)
 
 def create_scan_hosts_table(target_ip="empty", port_range="empty"):
     title = Text("Pentesting tool - Nmap - scan host ports")
@@ -45,19 +45,22 @@ def create_scan_hosts_table(target_ip="empty", port_range="empty"):
 
 
     functions = [
-        lambda: navigate(create_scan_hosts_table(input("test"),"test"))
+        test
     ]
 
     advancedTable = AdvancedTable(table, functions)
-    return advancedTable
+    navigate(advancedTable)
 
-def parse_port_range(port_range):
+def test():
+    name = input("test")
+    create_scan_hosts_table(name,"test")
+
+def generate_port_list(port_range):
     port_list = []
     ranges = port_range.split(',')
     
     for r in ranges:
         parts = r.split('-')
-        print(parts)
         if len(parts) == 1:
             port_list.append(int(parts[0]))
         elif len(parts) == 2:
@@ -68,19 +71,47 @@ def parse_port_range(port_range):
             raise ValueError("Ongeldige poortnotatie: {}".format(r))
     return port_list
 
+def scan_ip_hosts(target_ip_range):
+    import nmap
+    ping_results = {}
 
-def scan_hosts_for_open_ports():
-    ip_adress="127.0.0.1"
-    portlist=[22,23,24,25,26]
+    nm = nmap.PortScanner()
+    nm.scan(target_ip_range, arguments='-sn')
+    hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
+    for host, status in hosts_list:
+        print(f"{host}:{status}")
+        ping_results[host]=status
+
+
+    timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+    nmap_dir = pathlib.Path("nmap")
+    nmap_dir.mkdir(exist_ok=True, parents=True)
+    print(timestamp)
+    target_ip_range = target_ip_range.replace("/", "_with_range")
+    save_location = nmap_dir / f"scan_results_{target_ip_range}_{timestamp}_ping.json"
+    with save_location.open("w") as json_file_ping:
+        json.dump(ping_results, json_file_ping)
+
+
+def scan_hosts_for_open_ports(host, port_range):
+    import nmap
+    host_adress=host
+    try:
+        ipaddress.IPv4Address(host_adress)
+    except ipaddress.AddressValueError:
+        exit("Ongeldig ip adres")
+
+    port_range=generate_port_list(port_range)
     scan_results_short={}
     scan_results_raw={}
     
-    for port in portlist:
-        scan=nmap.PortScanner().scan(ip_adress,str(port))
-        state=scan["scan"][ip_adress]["tcp"][port]["state"]
-        protocol_name=scan["scan"][ip_adress]["tcp"][port]["name"]
-        reason=scan["scan"][ip_adress]["tcp"][port]["reason"]
-        version=scan["scan"][ip_adress]["tcp"][port]["version"]
+    for port in port_range:
+        print(f"Scanning port {port}...")
+        scan=nmap.PortScanner().scan(host_adress,str(port))
+        state=scan["scan"][host_adress]["tcp"][port]["state"]
+        protocol_name=scan["scan"][host_adress]["tcp"][port]["name"]
+        reason=scan["scan"][host_adress]["tcp"][port]["reason"]
+        version=scan["scan"][host_adress]["tcp"][port]["version"]
 
         scan_results_short[port]={
             "state": state,
@@ -88,15 +119,19 @@ def scan_hosts_for_open_ports():
             "reason": reason,
             "version": version
         }
-        scan_results_raw[port]= scan["scan"][ip_adress]
+        scan_results_raw[port]= scan["scan"][host_adress]
 
-    timestamp = datetime.now().strftime("%d%m%Y%H%M%S")
+    timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
     nmap_dir = pathlib.Path("nmap")
     nmap_dir.mkdir(exist_ok=True,parents=True)
 
-    save_location=nmap_dir/f"scan_results_{ip_adress}_{timestamp}_short.json"
+    save_location=nmap_dir/f"scan_results_{host_adress}_{timestamp}_short.json"
     with save_location.open("w") as json_file_short:
         json.dump(scan_results_short, json_file_short)
-    save_location=nmap_dir/f"scan_results_{ip_adress}_{timestamp}_raw.json"
+    save_location=nmap_dir/f"scan_results_{host_adress}_{timestamp}_raw.json"
     with save_location.open("w") as json_file_raw:
         json.dump(scan_results_raw, json_file_raw)
+
+def ping_scan():
+    import ping3
+    pinger= ping3.Ping()
