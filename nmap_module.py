@@ -1,59 +1,10 @@
-from rich.console import Console
-from rich.table import Table
-from rich.text import Text
 import json
 import pathlib
 from datetime import datetime
-from advancedTable import AdvancedTable
-from ui import navigate, set_value
 import ipaddress
 
 targetIp = ""
 port_range= ""
-def load():
-    scan_ip_hosts("192.168.2.0/24")
-
-def create_nmap_modes_table():
-    title = Text("Pentesting tool - Nmap")
-    title.stylize("bold red")
-    table = Table(title=title, style="red")
-
-    table.add_column("Mode", justify="left", style="bold white", no_wrap=True)
-    table.add_column("Info", style="magenta")
-
-    table.add_row("Port scan", "Een port scan uitvoeren op een specifieke host")
-    table.add_row("Ping scan", "Een ping scan uitvoeren op een reeks van hosts")
-    
-    functions = [
-        create_scan_hosts_table
-    ]
-
-    advancedTable = AdvancedTable(table, functions)
-    navigate(advancedTable)
-
-def create_scan_hosts_table(target_ip="empty", port_range="empty"):
-    title = Text("Pentesting tool - Nmap - scan host ports")
-    title.stylize("bold red")
-    table = Table(title=title, style="red")
-
-    table.add_column("Setting", justify="left", style="bold white", no_wrap=True)
-    table.add_column("Info", style="magenta")
-    table.add_column("value", style="magenta")
-
-    table.add_row("Ip adress", "Het adres van de target host",target_ip)
-    table.add_row("Ports", "De range van poorten. Mogelijke layout: '24,25,44-50,8080'",port_range)
-
-
-    functions = [
-        test
-    ]
-
-    advancedTable = AdvancedTable(table, functions)
-    navigate(advancedTable)
-
-def test():
-    name = input("test")
-    create_scan_hosts_table(name,"test")
 
 def generate_port_list(port_range):
     port_list = []
@@ -94,6 +45,7 @@ def scan_ip_hosts(target_ip_range):
 
 
 def scan_hosts_for_open_ports(host, port_range):
+    print("scanning")
     import nmap
     host_adress=host
     try:
@@ -131,7 +83,3 @@ def scan_hosts_for_open_ports(host, port_range):
     save_location=nmap_dir/f"scan_results_{host_adress}_{timestamp}_raw.json"
     with save_location.open("w") as json_file_raw:
         json.dump(scan_results_raw, json_file_raw)
-
-def ping_scan():
-    import ping3
-    pinger= ping3.Ping()

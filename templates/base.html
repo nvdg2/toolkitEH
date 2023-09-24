@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Grote Titel met Navigatieknoppen</title>
+    <style>
+        @font-face {
+            font-family: hacker; /* Geef het lettertype een naam */
+            src: url("../fonts/Hacker.ttf");
+            /* Voeg hier eventueel andere lettertype-indelingen toe, zoals woff2, ttf, enz. */
+        }
+
+        body {
+            text-align: center;
+            font-family: hacker;
+        }
+
+        .title {
+            font-size: 36px;
+            margin-top: 100px; /* Hiermee wordt de titel verticaal gecentreerd */
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">
+        <h1>Ethix</h1>
+    </div>
+    <div class="buttons">
+        <a href="{{url_for('nmap_flask.show_modes')}}" class="button">Knop 1</a>
+        <a href="#" class="button">Knop 2</a>
+        <a href="#" class="button">Knop 3</a>
+    </div>
+</body>
+</html>
