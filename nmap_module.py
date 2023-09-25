@@ -2,6 +2,8 @@ import json
 import pathlib
 from datetime import datetime
 import ipaddress
+import ssl
+import socket
 
 targetIp = ""
 port_range= ""
@@ -33,11 +35,9 @@ def scan_ip_hosts(target_ip_range):
         print(f"{host}:{status}")
         ping_results[host]=status
 
-
     timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
     nmap_dir = pathlib.Path("nmap")
     nmap_dir.mkdir(exist_ok=True, parents=True)
-    print(timestamp)
     target_ip_range = target_ip_range.replace("/", "_with_range")
     save_location = nmap_dir / f"scan_results_{target_ip_range}_{timestamp}_ping.json"
     with save_location.open("w") as json_file_ping:
@@ -83,3 +83,25 @@ def scan_hosts_for_open_ports(host, port_range):
     save_location=nmap_dir/f"scan_results_{host_adress}_{timestamp}_raw.json"
     with save_location.open("w") as json_file_raw:
         json.dump(scan_results_raw, json_file_raw)
+
+
+def scan_domain_for_cert(domain):
+    try:
+        print(f"Scanning domain {domain} for cert...")
+        context = ssl.create_default_context()
+        with socket.create_connection((domain, 443)) as sock:
+            with context.wrap_socket(sock, server_hostname=domain) as ssock:
+                cert = ssock.getpeercert()
+
+                timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+                nmap_dir = pathlib.Path("nmap")
+                nmap_dir.mkdir(exist_ok=True,parents=True)
+                save_location=nmap_dir/f"scan_result_{domain}_{timestamp}_cert.json"
+                with save_location.open("w") as json_file_raw:
+                    json.dump(cert, json_file_raw)
+
+                return cert
+            
+    except (ssl.SSLError, socket.error) as exception:
+        print(f"Er is een fout opgetreden bij het ophalen van het certificaat voor {domain}: {str(exception)}")
+        return None
