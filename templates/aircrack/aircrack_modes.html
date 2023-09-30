@@ -56,17 +56,36 @@
             outline: none;
             font-family: hacker;
         }
+        .interfaces {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .interface {
+            flex: 1;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+            color: rgb(255, 49, 49);
+            border: 1px solid rgb(255, 49, 49);
+            border-radius: 1rem;
+        }
     </style>
 </head>
 <body>
     <div class="title">
         <h1>Ethix</h1>
     </div>
+    <div class="interfaces">
+        {% for interface in interfaces %}
+        <div class="interface">
+            {{ interface }}
+        </div>
+        {% endfor %}
+    </div>
     <div class="buttons">
-        <a href="{{url_for('nmap.portscan')}}" class="button">Port scan</a>
+        <a href="{{url_for('nmap.portscan')}}" class="button"></a>
         <a href="{{url_for('nmap.pingscan')}}" class="button">Ping scan</a>
         <a href="{{url_for('nmap.certscan')}}" class="button">Cert scan</a>
-        <a href="{{url_for('main.index')}}" class="button">Back</a>
     </div>
 </body>
 </html>

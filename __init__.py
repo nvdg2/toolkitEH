@@ -1,12 +1,14 @@
 from flask import Flask
 from .main import main as main_blueprint
-from .nmap_flask import nmap as nmap_blueprint
+from .flask_code.nmap_flask import nmap as nmap_blueprint
+from .flask_code.aircrack_flask import aircrack as aircrack_blueprint
 
 def create_app():
     app = Flask(__name__)
 
     app.register_blueprint(main_blueprint)
     app.register_blueprint(nmap_blueprint)
+    app.register_blueprint(aircrack_blueprint)
 
     return app
     

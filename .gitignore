@@ -1,4 +1,5 @@
 /nmap
 /.venv
-/__pycache__
+__pycache__
 /aircrack-ng
+test.py

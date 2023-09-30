@@ -1,5 +1,5 @@
 from flask import Blueprint, url_for, render_template,request, make_response
-from . import nmap_module
+from ..modules import nmap_module
 nmap = Blueprint('nmap', __name__)
 
 @nmap.route('/nmap')
