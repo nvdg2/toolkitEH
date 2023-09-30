@@ -20,15 +20,24 @@ def certscan():
 
 @nmap.route('/nmap/portscan/exec_port_scan', methods=["POST"])
 def exec_port_scan():
-    nmap_module.scan_hosts_for_open_ports(request.form["target_ip"],request.form["port_range"])
-    return make_response("Scan succesfull",200)
+    response = nmap_module.scan_hosts_for_open_ports(request.form["target_ip"],request.form["port_range"])
+    if response == True:
+        return make_response("Scan succesfull",200)
+    else:
+        return make_response(f"{str(response)}",500)
 
 @nmap.route('/nmap/pingscan/exec_ping_scan', methods=["POST"])
 def exec_ping_scan():
-    nmap_module.scan_ip_hosts(request.form["target_ip_range"])
-    return make_response("Scan succesfull",200)
+    response = nmap_module.scan_ip_hosts(request.form["target_ip"],request.form["subnet_mask"])
+    if response == True:
+        return make_response("Scan succesfull",200)
+    else:
+        return make_response(f"{str(response)}",500)
 
 @nmap.route('/nmap/certscan/exec_cert_scan', methods=["POST"])
 def exec_cert_scan():
-    nmap_module.scan_domain_for_cert(request.form["domain"])
-    return make_response("Scan succesfull",200)
+    response = nmap_module.scan_domain_for_cert(request.form["domain"])
+    if response == True:
+        return make_response("Scan succesfull",200)
+    else:
+        return make_response(f"{str(response)}",500)

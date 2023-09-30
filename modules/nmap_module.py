@@ -8,6 +8,16 @@ import socket
 targetIp = ""
 port_range= ""
 
+class InvalidSubnetPrefixException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+class InvalidPortRangeException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
 def generate_port_list(port_range):
     port_list = []
     ranges = port_range.split(',')
@@ -24,10 +34,27 @@ def generate_port_list(port_range):
             raise ValueError("Ongeldige poortnotatie: {}".format(r))
     return port_list
 
-def scan_ip_hosts(target_ip_range):
+def scan_ip_hosts(target_ip, subnet_mask):
     import nmap
     ping_results = {}
 
+    try:
+        ipaddress.IPv4Address(target_ip)
+    except ipaddress.AddressValueError as exception:
+        print(f"Er is een fout opgetreden: {str(exception)}")
+        return exception
+    
+    try:
+        subnet_mask = int(subnet_mask)
+        if 0 <= subnet_mask <= 32:  # Subnet-prefixlengte mag variëren van 0 tot 32 voor IPv4
+            pass
+        else:
+            return InvalidSubnetPrefixException("Ongeldige subnetprefix")
+    except ValueError:
+        return InvalidSubnetPrefixException("Ongeldige subnetprefix")
+    
+    print("scanning")
+    target_ip_range = f"{target_ip}/{subnet_mask}"
     nm = nmap.PortScanner()
     nm.scan(target_ip_range, arguments='-sn')
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
@@ -42,18 +69,25 @@ def scan_ip_hosts(target_ip_range):
     save_location = nmap_dir / f"scan_results_{target_ip_range}_{timestamp}_ping.json"
     with save_location.open("w") as json_file_ping:
         json.dump(ping_results, json_file_ping)
+    
+    return True
 
 
 def scan_hosts_for_open_ports(host, port_range):
-    print("scanning")
+
     import nmap
     host_adress=host
     try:
         ipaddress.IPv4Address(host_adress)
-    except ipaddress.AddressValueError:
-        exit("Ongeldig ip adres")
-
-    port_range=generate_port_list(port_range)
+    except ipaddress.AddressValueError as exception:
+        print(f"Er is een fout opgetreden: {str(exception)}")
+        return exception
+        
+    print("scanning")
+    try:
+        port_range=generate_port_list(port_range)
+    except Exception:
+        return InvalidPortRangeException("Ongeldige poortnotatie")
     scan_results_short={}
     scan_results_raw={}
     
@@ -83,6 +117,8 @@ def scan_hosts_for_open_ports(host, port_range):
     save_location=nmap_dir/f"scan_results_{host_adress}_{timestamp}_raw.json"
     with save_location.open("w") as json_file_raw:
         json.dump(scan_results_raw, json_file_raw)
+    
+    return True
 
 
 def scan_domain_for_cert(domain):
@@ -99,9 +135,10 @@ def scan_domain_for_cert(domain):
                 save_location=nmap_dir/f"scan_result_{domain}_{timestamp}_cert.json"
                 with save_location.open("w") as json_file_raw:
                     json.dump(cert, json_file_raw)
-
-                return cert
+    
             
     except (ssl.SSLError, socket.error) as exception:
         print(f"Er is een fout opgetreden bij het ophalen van het certificaat voor {domain}: {str(exception)}")
-        return None
+        return exception
+    
+    return True

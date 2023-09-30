@@ -73,7 +73,9 @@
     </div>
     <form method="POST" action="/nmap/pingscan/exec_ping_scan" class="input_fields">
         <p>Target IP address</p>
-        <input id="target_ip_range" type="text" name="target_ip_range">
+        <input id="target_ip" type="text" name="target_ip">
+        <p>Subnet mask (prefix vorm)</p>
+        <input id="subnet_mask" type="text" name="subnet_mask">
         <div style="display: flex; justify-content: space-between;">
             <a href="{{url_for('nmap.show_modes')}}" class="button">Back</a>
             <input type="submit" class="button" value="SCAN" >
