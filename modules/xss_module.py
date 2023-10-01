@@ -42,23 +42,33 @@ def submit_form(form_details, url, value):
 
 def perform_XSS_scan(url):
     xss_payloads=[]
-    with open("../resources/xss_payload.txt","r") as file:
+    print("Staring XSS scan")
+    with open("resources/xss_payload.txt","r") as file:
         while True:
-            line=file.readline()
-            line=line.replace("\n","")
+            line=file.readline().replace("\n","")
             if len(line) == 0:
                 break
             xss_payloads.append(line)
-    forms=get_forms_from_webpage(url)
 
-    print(f"Found {len(forms)} forms on {url}.")
+    try:
+        forms=get_forms_from_webpage(url)
+    except requests.exceptions.MissingSchema as e:
+        return(f"Error: {str(e)}")
+    
+    if len(forms) == 0:
+        return {"message":"No forms found"}
+    
     for form in forms:
         form_details=get_details_of_form(form)
     
         for payload in xss_payloads:
             response=submit_form(form_details,url,payload)
             if payload in response.content.decode():
-                print(f"XSS vulnerability detected on {url}")
-                print(f"Form details:")
-                pprint(form_details)
-                break
+                return {
+                    "message":"XSS vulnerability detected!",
+                    "payload":payload,
+                    "form_details":form_details
+                }
+            
+        return {"message":"No XSS vulnerabilities detected}"}
+            

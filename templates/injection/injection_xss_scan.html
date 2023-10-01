@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SXX scan</title>
+    <style>
+        @font-face {
+            font-family: hacker;
+            src: url("{{url_for('static', filename='fonts/Hacker.ttf')}}");
+        }
+
+        body {
+            font-family: hacker;
+            background-color: rgb(24, 26, 27);
+        }
+
+        .title {
+            font-size: 36px;
+            margin-top: 100px; /* Hiermee wordt de titel verticaal gecentreerd */
+            width: 100%;
+            text-align: center;
+            color: white;
+        }
+        .input_fields {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            width: 100%;
+            justify-self: center;
+        }
+        p {
+            display: block;
+            color: rgb(255, 49, 49);
+            font-size: 18px;
+            font-family: hacker;
+        }
+
+        input {
+            height: 2.5rem;
+            border-radius: 1rem;
+            border: solid 1px rgb(255, 49, 49);;
+            font-size: 18px;
+            background-color: rgb(24, 26, 27);
+            color: rgb(255, 49, 49);
+            outline: none;
+            width: 30rem;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: rgb(255, 49, 49);
+            color: #fff;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+            width: 8rem;
+            font-family: hacker;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="title">
+        <h1>Ethix</h1>
+    </div>
+    <form method="POST" action="/injection/xssscan/exec_xss_scan" class="input_fields">
+        <p>Target url</p>
+        <input id="target_url" type="text" name="target_url">
+        <div style="display: flex; justify-content: space-between;">
+            <a href="{{url_for('nmap.show_modes')}}" class="button">Back</a>
+            <input type="submit" class="button" value="SCAN" >
+        </div>
+    </form>
+</body>
+</html>
