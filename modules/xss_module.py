@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
 import requests
 # Code is gebaseerd op de volgende bron: https://systemweakness.com/building-an-xss-scanner-with-python-detecting-cross-site-scripting-vulnerabilities-by-tommaso-69d4c9e04d72
-def get_web_page(url):
+
+def get_forms_from_webpage(url):
     page = bs(requests.get(url).content, "html.parser")
     forms = page.find_all("form")
     return forms
@@ -39,10 +40,25 @@ def submit_form(form_details, url, value):
         return requests.post(target_url, data=data)
     return requests.get(target_url, params=data)
 
+def perform_XSS_scan(url):
+    xss_payloads=[]
+    with open("../resources/xss_payload.txt","r") as file:
+        while True:
+            line=file.readline()
+            line=line.replace("\n","")
+            if len(line) == 0:
+                break
+            xss_payloads.append(line)
+    forms=get_forms_from_webpage(url)
 
-if __name__=="__main__":
-
-    forms=get_web_page("http://127.0.0.1:5000/nmap/portscan")
+    print(f"Found {len(forms)} forms on {url}.")
     for form in forms:
-        form_details = get_details_of_form(form)
-        print(submit_form(form_details, "http://127.0.0.1:5000/nmap/portscan","test"))
+        form_details=get_details_of_form(form)
+    
+        for payload in xss_payloads:
+            response=submit_form(form_details,url,payload)
+            if payload in response.content.decode():
+                print(f"XSS vulnerability detected on {url}")
+                print(f"Form details:")
+                pprint(form_details)
+                break
