@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Grote Titel met Navigatieknoppen</title>
+    <title>Denail of Service</title>
     <style>
         @font-face {
             font-family: hacker;
@@ -38,7 +38,7 @@
             text-decoration: none;
             cursor: pointer;
             display: block;
-            width: 8rem;
+            width: max-content;
         }
         .input_fields {
             display: block;
@@ -47,7 +47,7 @@
         }
         input {
             display: block;
-            height: 2.5rem;
+            height: 3rem;
             border-radius: 1rem;
             border: solid 1px rgb(255, 49, 49);;
             font-size: 18px;
@@ -63,10 +63,9 @@
         <h1>Ethix</h1>
     </div>
     <div class="buttons">
-        <a href="{{url_for('nmap.show_modes')}}" class="button">NMAP scans</a>
-        <a href="{{url_for('aircrack.show_modes')}}" class="button">Aircrack</a>
-        <a href="{{url_for('injection.show_modes')}}" class="button">Injection attacks</a>
-        <a href="{{url_for('dos.show_modes')}}" class="button">DOS</a>
+        <a href="{{url_for('dos.http')}}" class="button">http volume attack</a>
+        <a href="{{url_for('dos.deauth')}}" class="button">access point deauth attack</a>
+        <a href="{{url_for('main.index')}}" class="button">Back</a>
     </div>
 </body>
 </html>
