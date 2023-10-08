@@ -1,7 +1,7 @@
 from flask import Blueprint, url_for, render_template,request, make_response
-from ..modules import xss_module
+import subprocess
 dos = Blueprint('dos', __name__)
-
+import os
 @dos.route('/dos')
 def show_modes():
     return render_template('dos/dos_modes.html')
@@ -16,8 +16,28 @@ def deauth():
 
 @dos.route('/dos/http/exec_http_dos',methods=["POST"])
 def exec_http_attack():
-    return xss_module.perform_XSS_scan(request.form["target_url"])
+    return None
 
 @dos.route('/dos/deauth/exec_deauth_dos',methods=["POST"])
 def exec_deauth_attack():
-    return xss_module.perform_XSS_scan(request.form["target_url"])
+    pass_input = [
+        "echo",
+        request.form['root_password'],
+    ]
+    execute_deauth = [
+        "sudo",
+        "-S",
+        "-k",
+        "python",
+        "modules/dos/deauth_module.py",
+        request.form['mac_address_access_point'],
+        request.form['mac_address_target_device'],
+        request.form['amount_of_deauth_packets']
+    ]
+    ps1 = subprocess.Popen(pass_input, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    ps2 = subprocess.Popen(execute_deauth, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    stdout1, stderr1 = ps1.communicate()
+    ps2.stdin.write(stdout1)
+    print(ps2.communicate())
+
+    return make_response("Deauth attack executed",200)

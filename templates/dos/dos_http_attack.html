@@ -65,30 +65,39 @@
             text-align: center;
         }
 
+        label {
+            color: rgb(255, 49, 49);
+            align-self: center;
+        }
+
+        #distributed_checkbox {
+            width: 2rem;
+            height: 2rem;
+            margin-right: 1rem;
+            
+        }
+
     </style>
 </head>
 <body>
     <div class="title">
         <h1>Ethix</h1>
-        <p>Warning: during the attack you connection to the internet will be interrupted</p>
     </div>
     <form method="POST" action="/dos/deauth/exec_deauth_dos" class="input_fields">
         <p>Mac address access point</p>
-        <input id="mac_address_access_point" type="text" name="mac_address_access_point">
-
+        <input id="mac_address_ap" type="text" name="mac_address_ap">
         <p>Mac address target device</p>
         <input id="mac_address_target_device" type="text" name="mac_address_target_device">
-
-        <p>Amount of deauth packets</p>
-        <input id="amount_of_deauth_packets" type="number" name="amount_of_deauth_packets">
-
-        <p>Root password (required fot this attack)</p>
-        <input id="root_password" type="password" name="root_password">
+        <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; align-content: center;">
+            <input type="checkbox" id="distributed_checkbox" name="interest" checked />
+            <label for="distributed_checkbox">Distributed attack</label>
+        </div>
 
         <div style="display: flex; justify-content: space-between;">
             <a href="{{url_for('dos.show_modes')}}" class="button">Back</a>
             <input type="submit" class="button" value="ATTACK" >
         </div>
+
     </form>
 </body>
 </html>
