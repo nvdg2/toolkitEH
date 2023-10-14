@@ -12,29 +12,32 @@
         body {
             font-family: hacker;
             background-color: rgb(24, 26, 27);
+            display: grid;
         }
 
         .title {
             font-size: 36px;
-            margin-top: 100px; /* Hiermee wordt de titel verticaal gecentreerd */
+            margin-top: 50px; /* Hiermee wordt de titel verticaal gecentreerd */
             width: 100%;
             text-align: center;
             color: white;
         }
-        .input_fields {
+
+        p, label {
+            display: block;
+            color: rgb(255, 49, 49);
+            font-size: 18px;
+            font-family: hacker;
+        }
+
+        form {
             display: flex;
             flex-direction: column;
             flex-wrap: wrap;
             justify-content: center;
             align-content: center;
-            width: 100%;
+            width: 30%;
             justify-self: center;
-        }
-        p {
-            display: block;
-            color: rgb(255, 49, 49);
-            font-size: 18px;
-            font-family: hacker;
         }
 
         input {
@@ -45,7 +48,7 @@
             background-color: rgb(24, 26, 27);
             color: rgb(255, 49, 49);
             outline: none;
-            width: 30rem;
+            width: 100%;
         }
 
         .button {
@@ -67,15 +70,30 @@
 
         label {
             color: rgb(255, 49, 49);
+            font-size: 18px;
+            font-family: hacker;
             align-self: center;
+        }
+
+        textarea {
+            height: 2.5rem;
+            border-radius: 1rem;
+            border: solid 1px rgb(255, 49, 49);;
+            font-size: 18px;
+            background-color: rgb(24, 26, 27);
+            color: rgb(255, 49, 49);
+            outline: none;
+            width: 100%;
+            height: 15rem;
         }
 
         #distributed_checkbox {
             width: 2rem;
             height: 2rem;
             margin-right: 1rem;
-            
         }
+
+
 
     </style>
 </head>
@@ -83,21 +101,54 @@
     <div class="title">
         <h1>Ethix</h1>
     </div>
-    <form method="POST" action="/dos/deauth/exec_deauth_dos" class="input_fields">
-        <p>Mac address access point</p>
-        <input id="mac_address_ap" type="text" name="mac_address_ap">
-        <p>Mac address target device</p>
-        <input id="mac_address_target_device" type="text" name="mac_address_target_device">
+    
+    <form method="POST" action="/dos/http/exec_http_dos">
+        <p>Target host</p>
+        <input id="target_host" type="text" name="target_host">
+        <p>Target port</p>
+        <input id="target_port" type="number" name="target_port">
+
         <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; align-content: center;">
-            <input type="checkbox" id="distributed_checkbox" name="interest" checked />
+            <input type="checkbox" id="distributed_checkbox" name="distributed_checkbox" checked />
             <label for="distributed_checkbox">Distributed attack</label>
         </div>
+
+
+        <div id="distributed_fields">
+            <textarea name="bot_list" id="bot_list" style="display: block;"></textarea>
+            <p>Private key file location</p>
+            <input id="private_key_file_location" type="text" name="private_key_file_location">
+            <p>Private key file password</p>
+            <input id="private_key_file_password" type="password" name="private_key_file_password">
+        </div>
+
 
         <div style="display: flex; justify-content: space-between;">
             <a href="{{url_for('dos.show_modes')}}" class="button">Back</a>
             <input type="submit" class="button" value="ATTACK" >
         </div>
-
     </form>
 </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Zoek de relevante elementen op
+        var distributed_fields = document.getElementById("distributed_fields");
+        var distributedCheckbox = document.getElementById("distributed_checkbox");
+
+    
+        // Voeg een event listener toe aan de checkbox om wijzigingen te detecteren
+        distributedCheckbox.addEventListener("change", function() {
+            if (distributedCheckbox.checked) {
+                // Als de checkbox is aangevinkt, toon de private key-velden
+                distributed_fields.style.display = "block";
+            } else {
+                // Als de checkbox is uitgevinkt, verberg de private key-velden
+                distributed_fields.style.display = "none";
+            }
+        });
+    });
+</script>
+
+
 </html>
