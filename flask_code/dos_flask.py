@@ -8,7 +8,7 @@ def show_modes():
 
 @dos.route('/dos/http')
 def http():
-    return render_template('injection/injection_xss_scan.html')
+    return render_template('dos/dos_http_attack.html')
 
 @dos.route('/dos/deauth')
 def deauth():
@@ -16,7 +16,29 @@ def deauth():
 
 @dos.route('/dos/http/exec_http_dos',methods=["POST"])
 def exec_http_attack():
-    return None
+    isDistributed = False
+    command=[]
+    if "distributed_checkbox" in request.form:
+        isDistributed = True
+        command = [
+            "python3",  # Het Python-interpretercommando
+            "modules/dos/http_module.py",  # Vervang dit door het daadwerkelijke pad naar je script
+            request.form['target_host'],
+            request.form['target_port'],
+            "--distributed" ,  # Voeg "--distributed" toe als isDistributed waar is
+            "--bot_list", request.form['bot_list'],
+            "--private_key", request.form['private_key_file_location'],
+            "--password", request.form['private_key_file_password']
+        ]
+    else:
+        command=[
+            "python3",  # Het Python-interpretercommando
+            "modules/dos/http_module.py",  
+            request.form['target_host'],
+            request.form['target_port'],
+        ]
+    ps1=subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    return request.form
 
 @dos.route('/dos/deauth/exec_deauth_dos',methods=["POST"])
 def exec_deauth_attack():

