@@ -71,11 +71,13 @@
     <div class="title">
         <h1>Ethix</h1>
     </div>
-    <form method="POST" action="/nmap/certscan/exec_cert_scan" class="input_fields">
-        <p>Target domain name</p>
-        <input id="domain" type="text" name="domain">
+    <form method="POST" action="/scan/nmap/pingscan/exec_ping_scan" class="input_fields">
+        <p>Target IP address</p>
+        <input id="target_ip" type="text" name="target_ip">
+        <p>Subnet mask (prefix vorm)</p>
+        <input id="subnet_mask" type="text" name="subnet_mask">
         <div style="display: flex; justify-content: space-between;">
-            <a href="{{url_for('nmap.show_modes')}}" class="button">Back</a>
+            <a href="{{url_for('scan.show_modes')}}" class="button">Back</a>
             <input type="submit" class="button" value="SCAN" >
         </div>
 

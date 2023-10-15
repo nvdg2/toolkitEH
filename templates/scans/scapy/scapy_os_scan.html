@@ -71,16 +71,15 @@
     <div class="title">
         <h1>Ethix</h1>
     </div>
-    <form method="POST" action="/nmap/portscan/exec_port_scan" class="input_fields">
-        <p>Ip address</p>
+    <form method="POST" action="/scan/scapy/osscan/exec_os_scan" class="input_fields">
+        <p>Target IP address</p>
         <input id="target_ip" type="text" name="target_ip">
-        <p>Port range</p>
-        <input id="port_range" type="text" name="port_range">
+        <p>Root pass</p>
+        <input id="root_password" type="password" name="root_password">
         <div style="display: flex; justify-content: space-between;">
-            <a href="{{url_for('nmap.show_modes')}}" class="button">Back</a>
+            <a href="{{url_for('scan.show_modes')}}" class="button">Back</a>
             <input type="submit" class="button" value="SCAN" >
         </div>
-
     </form>
 </body>
 </html>

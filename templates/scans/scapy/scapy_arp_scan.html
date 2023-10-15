@@ -71,13 +71,15 @@
     <div class="title">
         <h1>Ethix</h1>
     </div>
-    <form method="POST" action="/nmap/pingscan/exec_ping_scan" class="input_fields">
-        <p>Target IP address</p>
+    <form method="POST" action="/scan/scapy/arpscan/exec_arp_scan" class="input_fields">
+        <p>Target IP range</p>
         <input id="target_ip" type="text" name="target_ip">
         <p>Subnet mask (prefix vorm)</p>
-        <input id="subnet_mask" type="text" name="subnet_mask">
+        <input id="subnet_mask" type="text" name="subnet_mask">4
+        <p>Root pass</p>
+        <input id="root_password" type="password" name="root_password">
         <div style="display: flex; justify-content: space-between;">
-            <a href="{{url_for('nmap.show_modes')}}" class="button">Back</a>
+            <a href="{{url_for('scan.show_modes')}}" class="button">Back</a>
             <input type="submit" class="button" value="SCAN" >
         </div>
 
