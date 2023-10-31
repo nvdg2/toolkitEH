@@ -1,5 +1,4 @@
 from flask import Blueprint, url_for, render_template,request, make_response
-from ..modules import mitm_module
 mitm = Blueprint('mitm', __name__)
 import ipaddress
 import subprocess
@@ -19,7 +18,7 @@ def is_valid_ip(ip):
 def exec_mitm_attack():
     target_ip = request.form["target_ip"] 
     if is_valid_ip(target_ip): # Add ip validation to prevent command injection
-        subprocess.run([f'xterm -fs 14 -fa DejaVuSansMono -e "source .venv/bin/activate && sudo python3 modules/mitm_module.py {target_ip}"'],shell=True)
+        subprocess.run([f'xterm -fs 14 -fa DejaVuSansMono -e "source .venv/bin/activate && sudo python3 modules/mitm/mitm_module.py {target_ip}"'],shell=True)
         return make_response("MITM attack succesfull",200)
     else:
         return make_response("Invalid target ip",400)
