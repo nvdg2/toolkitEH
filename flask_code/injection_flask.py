@@ -22,5 +22,4 @@ def exec_xss_scan():
 
 @injection.route('/injection/wordlist/exec_wordlist_attack',methods=["POST"])
 def exec_woordlist_attack():
-    #return request.form
     return robot_txt_module.perform_wordlist_attack(request.form["target_url"],request.form["wordlist"])
