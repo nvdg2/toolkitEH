@@ -21,11 +21,12 @@ def mitm_attack():
 @mitm.route('/mitm_attack/exec_mitm_attack', methods=["POST"])
 def exec_mitm_attack():
     target_ip = request.form["target_ip"]
-    create_dns_records_file(request.form["fake_dns_records"])
+
     if is_valid_ip(target_ip): # Add ip validation to prevent command injection
-        if request.form["dns_spoofing_checkbox"] == "false":
+        if request.form["fake_dns_records"] == "":
             subprocess.Popen([f'xterm -fs 14 -fa DejaVuSansMono -e "source .venv/bin/activate && sudo python3 modules/mitm/mitm_module.py {target_ip}"'],shell=True)
         else:
+            create_dns_records_file(request.form["fake_dns_records"])
             subprocess.Popen([f'xterm -fs 14 -fa DejaVuSansMono -e "source .venv/bin/activate && sudo python3 modules/mitm/mitm_module.py {target_ip} --dnsspoof"'],shell=True)
         return make_response("MITM attack started",200)
     else:

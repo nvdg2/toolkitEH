@@ -93,8 +93,13 @@ def scan_hosts_for_open_ports(host, port_range):
     
     for port in port_range:
         print(f"Scanning port {port}...")
-        scan=nmap.PortScanner().scan(host_adress,str(port))
-        state=scan["scan"][host_adress]["tcp"][port]["state"]
+        try:
+            scan=nmap.PortScanner().scan(host_adress,str(port))
+            state=scan["scan"][host_adress]["tcp"][port]["state"]
+        except KeyError as e:
+            print(f"Er is een fout opgetreden: {e}")
+            print("Scan gaat verder...")
+            continue
         protocol_name=scan["scan"][host_adress]["tcp"][port]["name"]
         reason=scan["scan"][host_adress]["tcp"][port]["reason"]
         version=scan["scan"][host_adress]["tcp"][port]["version"]
