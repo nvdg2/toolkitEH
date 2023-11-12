@@ -3,6 +3,7 @@ import argparse
 from scapy.layers.inet import IP, TCP, ICMP, UDP
 from scapy.layers.l2 import ARP
 import datetime
+import os
 # Functie om ARP-hostdetectie uit te voeren
 def arp_scan(ip_range):
     arp_request = scapy.ARP(pdst=ip_range)
@@ -81,7 +82,7 @@ def log_results(results, folder, log_file, extra_info=""):
     from pathlib import Path
     doelmap = Path(f'scapy/{folder}')
     doelmap.mkdir(parents=True, exist_ok=True)
-
+    os.chown(doelmap,1000,1000)
     with open(f"{doelmap}/{filename}", "w") as file:
         match folder:
             case "OS":
