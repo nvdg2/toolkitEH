@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Injection</title>
+    <title>Grote Titel met Navigatieknoppen</title>
     <style>
         @font-face {
             font-family: hacker;
@@ -47,7 +47,7 @@
         }
         input {
             display: block;
-            height: 3rem;
+            height: 2.5rem;
             border-radius: 1rem;
             border: solid 1px rgb(255, 49, 49);;
             font-size: 18px;
@@ -63,8 +63,7 @@
         <h1>Ethix</h1>
     </div>
     <div class="buttons">
-        <a href="{{url_for('injection.xssscan')}}" class="button">XSS scan</a>
-        <a href="{{url_for('injection.wordlist_attack')}}" class="button">Wordlist attack</a>
+        <a href="{{url_for('other.bssid_scan')}}" class="button">Bssid scan</a>
         <a href="{{url_for('main.index')}}" class="button">Back</a>
     </div>
 </body>

@@ -4,6 +4,7 @@ from .flask_code.scan_flask import scan as scan_blueprint
 from .flask_code.mitm_flask import mitm as mitm_blueprint
 from .flask_code.injection_flask import injection as injection_blueprint
 from .flask_code.dos_flask import dos as dos_blueprint
+from .flask_code.other_flask import other as other_blueprint
 def create_app():
     app = Flask(__name__)
 
@@ -12,7 +13,7 @@ def create_app():
     app.register_blueprint(mitm_blueprint)
     app.register_blueprint(injection_blueprint)
     app.register_blueprint(dos_blueprint)
-
+    app.register_blueprint(other_blueprint)
     return app
     
 
