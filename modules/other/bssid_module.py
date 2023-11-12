@@ -34,6 +34,7 @@ def start_bssid_scan(interface,shutdown_signal:threading.Event,results:list):
     while not shutdown_signal.is_set():
         try:
             sniff(iface=f"{interface}mon", prn=process_packet, timeout=0.5)
+            print(f"found bssid's: {bssid_info.keys()}")
             active_channel+=1
             if active_channel % 14 == 0:
                 active_channel=1
