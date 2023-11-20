@@ -14,6 +14,10 @@ def http():
 def deauth():
     return render_template('dos/dos_deauth_attack.html')
 
+@dos.route('/dos/starvation')
+def starvation():
+    return render_template('dos/dos_starvation_attack.html')
+
 @dos.route('/dos/http/exec_http_dos',methods=["POST"])
 def exec_http_attack():
     isDistributed = False
@@ -63,3 +67,9 @@ def exec_deauth_attack():
     print(ps2.communicate())
 
     return make_response("Deauth attack executed",200)
+
+@dos.route('/dos/starvation/exec_starvation_dos',methods=["POST"])
+def exec_starvation_attack():
+    interface=request.form["interface"]
+    subprocess.Popen([f'xterm -fs 14 -fa DejaVuSansMono -e "source .venv/bin/activate && sudo python3 modules/dos/starvation_module.py --interface {interface}"'],shell=True)
+    return make_response("Starvation attack started",200)

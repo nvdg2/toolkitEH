@@ -101,7 +101,7 @@ def execute_starve_silly_dhcp_server(interface):
 
 def main():
     parser = argparse.ArgumentParser(description="Voer een DHCP starvation aanval uit.")
-    parser.add_argument("--interface", required=True, type=str, help="De interface die zich in het netwerk van de DHCP server bevindt")
+    parser.add_argument("--interface", required=True, help="De interface die zich in het netwerk van de DHCP server bevindt")
 
     args = parser.parse_args()
 
