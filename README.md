@@ -4,7 +4,7 @@
 
 Vooraleer deze toolkit gebruikt kan worden, moeten er eerst enkele acties uitgevoerd worden.
 
-### Installeer de nodige pakketten.
+### Installeer de nodige pakketten
 
 Sommige python libraries, hebben onderliggende systeempakketten nodig. Installeer daarom de volgende pakketten:
 
