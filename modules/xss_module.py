@@ -70,5 +70,5 @@ def perform_XSS_scan(url):
                     "form_details":form_details
                 }
             
-        return {"message":"No XSS vulnerabilities detected}"}
+        return {"message":"No XSS vulnerabilities detected"}
             

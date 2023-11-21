@@ -70,7 +70,7 @@ def scan_ip_hosts(target_ip, subnet_mask):
     save_location = nmap_dir / f"scan_results_{target_ip_range}_{timestamp}_ping.json"
     with save_location.open("w") as json_file_ping:
         json.dump(ping_results, json_file_ping)
-    os.chow(nmap_dir,1000,1000)
+    os.chown(nmap_dir,1000,1000)
     return True
 
 
