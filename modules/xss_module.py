@@ -3,6 +3,10 @@ from pprint import pprint
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
 import requests
+from datetime import datetime
+import json
+import pathlib
+import argparse
 # Code is gebaseerd op de volgende bron: https://systemweakness.com/building-an-xss-scanner-with-python-detecting-cross-site-scripting-vulnerabilities-by-tommaso-69d4c9e04d72
 
 def get_forms_from_webpage(url):
@@ -42,7 +46,7 @@ def submit_form(form_details, url, value):
 
 def perform_XSS_scan(url):
     xss_payloads=[]
-    print("Staring XSS scan")
+    print("Starting XSS scan")
     with open("resources/xss_payload.txt","r") as file:
         while True:
             line=file.readline().replace("\n","")
@@ -64,11 +68,33 @@ def perform_XSS_scan(url):
         for payload in xss_payloads:
             response=submit_form(form_details,url,payload)
             if payload in response.content.decode():
-                return {
+                print("XSS vulnerabilities detected")
+                result={
+                    "site": url,
                     "message":"XSS vulnerability detected!",
                     "payload":payload,
                     "form_details":form_details
                 }
-            
+
+                timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+                xss_dir = pathlib.Path("logs/xss_scans")
+                xss_dir.mkdir(exist_ok=True,parents=True)
+                save_location=xss_dir/f"XSS_scan_{timestamp}.json"
+                os.chown(xss_dir,1000,1000)
+                with save_location.open("w") as json_file_raw:
+                    json.dump(result, json_file_raw)
+
+                return result
+        print("No XSS vulnerabilities detected")
         return {"message":"No XSS vulnerabilities detected"}
-            
+
+def main():
+    parser = argparse.ArgumentParser(description="Script om een form te testen op cross site scripting zwakheden.")
+    parser.add_argument("url_with_form", help="URL van pagina waar form in staat.")
+
+    args = parser.parse_args()
+
+    perform_XSS_scan(args.url_with_form)
+
+if __name__ == "__main__":
+    main()
