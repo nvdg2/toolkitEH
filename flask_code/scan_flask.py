@@ -1,6 +1,6 @@
 from flask import Blueprint, url_for, render_template,request, make_response
-from ..modules import nmap_module
-from..modules import scapy_module
+from ..modules.scans import nmap_module
+from ..modules.scans import scapy_module
 import subprocess
 scan = Blueprint('scan', __name__)
 
@@ -81,23 +81,23 @@ def exec_nmap_cert_scan():
 @scan.route('/scan/scapy/arpscan/exec_arp_scan', methods=["POST"])
 def exec_scapy_arp_scan():
     ip_range=f"{request.form['target_ip']}/{request.form['subnet_mask']}"
-    execute_sudo_scan(["sudo","-S","-k","python","modules/scapy_module.py","-i",ip_range])
+    execute_sudo_scan(["sudo","-S","-k","python","modules/scans/scapy_module.py","-i",ip_range])
     print("ARP SCAN UITGEVOERD, logfiles worden gegenereerd")
     return make_response("Arp scan finished",200)
 
 @scan.route('/scan/scapy/portscan/exec_port_scan', methods=["POST"])
 def exec_scapy_port_scan():
-    execute_sudo_scan(["sudo","-S","-k","python","modules/scapy_module.py","-t",request.form['target_ip'],"-p"])
+    execute_sudo_scan(["sudo","-S","-k","python","modules/scans/scapy_module.py","-t",request.form['target_ip'],"-p"])
     print("PORT SCAN UITGEVOERD, logfiles worden gegenereerd")
     return make_response("Port scan finished",200)
 
 @scan.route('/scan/scapy/osscan/exec_os_scan', methods=["POST"])
 def exec_scapy_os_scan():
-    execute_sudo_scan(["sudo","-S","-k","python","modules/scapy_module.py","-t",request.form['target_ip'],"-o"])
+    execute_sudo_scan(["sudo","-S","-k","python","modules/scans/scapy_module.py","-t",request.form['target_ip'],"-o"])
     print("OS SCAN UITGEVOERD, logfiles worden gegenereerd")
     return make_response("OS scan finished",200)
 
 @scan.route('/scan/scapy/pcapscan/exec_pcap_scan', methods=["POST"])
 def exec_scapy_pcap_scan():
-    execute_sudo_scan(["sudo","-S","-k","python","modules/scapy_module.py","-a",request.form['pcap_file']])
+    execute_sudo_scan(["sudo","-S","-k","python","modules/scans/scapy_module.py","-a",request.form['pcap_file']])
     return make_response("PCAP scan finished, logfiles worden gegenereerd",200)
