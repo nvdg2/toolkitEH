@@ -1,6 +1,6 @@
 from flask import Blueprint, url_for, render_template,request, make_response
-from ..modules import xss_module
-from ..modules import robot_txt_module
+from ..modules.web import xss_module
+from ..modules.web import robot_txt_module
 injection = Blueprint('injection', __name__)
 
 @injection.route('/injection')
