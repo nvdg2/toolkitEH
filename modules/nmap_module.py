@@ -64,7 +64,7 @@ def scan_ip_hosts(target_ip, subnet_mask):
         ping_results[host]=status
 
     timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-    nmap_dir = pathlib.Path("nmap")
+    nmap_dir = pathlib.Path("logs/nmap")
     nmap_dir.mkdir(exist_ok=True, parents=True)
     target_ip_range = target_ip_range.replace("/", "_with_range")
     save_location = nmap_dir / f"scan_results_{target_ip_range}_{timestamp}_ping.json"
@@ -114,7 +114,7 @@ def scan_hosts_for_open_ports(host, port_range):
         scan_results_raw[port]= scan["scan"][host_adress]
 
     timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-    nmap_dir = pathlib.Path("nmap")
+    nmap_dir = pathlib.Path("logs/nmap")
     nmap_dir.mkdir(exist_ok=True,parents=True)
 
     save_location=nmap_dir/f"scan_results_{host_adress}_{timestamp}_short.json"
@@ -136,7 +136,7 @@ def scan_domain_for_cert(domain):
                 cert = ssock.getpeercert()
 
                 timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-                nmap_dir = pathlib.Path("nmap")
+                nmap_dir = pathlib.Path("logs/nmap")
                 nmap_dir.mkdir(exist_ok=True,parents=True)
                 save_location=nmap_dir/f"scan_result_{domain}_{timestamp}_cert.json"
                 with save_location.open("w") as json_file_raw:
