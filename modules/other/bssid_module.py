@@ -67,7 +67,7 @@ def main():
         subprocess.run(["sudo", "airmon-ng", "stop", f"{args.interface}mon"])
         
         timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-        bssid_dir = pathlib.Path("bssid_scans")
+        bssid_dir = pathlib.Path("logs/bssid_scans")
         bssid_dir.mkdir(exist_ok=True,parents=True)
         save_location=bssid_dir/f"network_scan_{timestamp}.json"
         os.chown(bssid_dir,1000,1000)
