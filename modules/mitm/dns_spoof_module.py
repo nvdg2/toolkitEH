@@ -28,10 +28,7 @@ def spoof_packet(packet):
 
 def convert_to_dns_list(dns_path):
     records={}
-    if dns_path=="":
-        dns_path="resources/mitm/fake_dns_records.txt"
-    else:
-        dns_path=dns_path
+    dns_path=dns_path
     try:
         with open(dns_path, "r") as f:
             while True:
@@ -67,11 +64,10 @@ def dns_spoof(dns_path):
         exit(1)
 
 def main():
-    parser = argparse.ArgumentParser(description="Script for performing dns spoofing.")
-    parser.add_argument("-f", default="", help="Custom path to dns_records_file. Example: -f resources/mitm/fake_dns_records.txt")
+    parser = argparse.ArgumentParser(description="Script om DNS spoofing uit te voeren")
+    parser.add_argument("-f", default="resources/mitm/fake_dns_records.txt", help="Een ander pad opgeven voor de fake DNS recoeds. Voorbeeld: resources/mitm/fake_dns_records.txt")
     args = parser.parse_args()
     dns_records_path = args.f
-
     dns_spoof(dns_records_path)
 
 if __name__ == "__main__":

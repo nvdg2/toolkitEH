@@ -5,6 +5,7 @@ import ipaddress
 import ssl
 import socket
 import os
+import argparse
 
 targetIp = ""
 port_range= ""
@@ -35,7 +36,7 @@ def generate_port_list(port_range):
             raise ValueError("Ongeldige poortnotatie: {}".format(r))
     return port_list
 
-def scan_ip_hosts(target_ip, subnet_mask):
+def scan_ip_hosts(target_ip, prefix):
     import nmap
     ping_results = {}
 
@@ -46,8 +47,8 @@ def scan_ip_hosts(target_ip, subnet_mask):
         return exception
     
     try:
-        subnet_mask = int(subnet_mask)
-        if 0 <= subnet_mask <= 32:  # Subnet-prefixlengte mag variëren van 0 tot 32 voor IPv4
+        prefix = int(prefix)
+        if 0 <= prefix <= 32:  # Subnet-prefixlengte mag variëren van 0 tot 32 voor IPv4
             pass
         else:
             return InvalidSubnetPrefixException("Ongeldige subnetprefix")
@@ -55,7 +56,7 @@ def scan_ip_hosts(target_ip, subnet_mask):
         return InvalidSubnetPrefixException("Ongeldige subnetprefix")
     
     print("scanning")
-    target_ip_range = f"{target_ip}/{subnet_mask}"
+    target_ip_range = f"{target_ip}/{prefix}"
     nm = nmap.PortScanner()
     nm.scan(target_ip_range, arguments='-sn')
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
@@ -148,3 +149,39 @@ def scan_domain_for_cert(domain):
         return exception
     
     return True
+
+def main():
+    parser = argparse.ArgumentParser(description="Ethical hacking scans met Nmap")
+    parser.add_argument("-i", "--ip_range", help="IP-range scan uitvoeren (netwerk ip opgeven) [IP range scan]")
+    parser.add_argument("-s", "--subnetprefix", default=None, help="Subnet prefix van het doelnetwerk [IP range scan]")
+    
+    parser.add_argument("-p", "--portscan", action="store_true", help="Poortscan uitvoeren [poort scan]")
+    parser.add_argument("-t", "--target", default=None, help="Target ip adres of domeinnaam [poort scan (ip), cert scan (domein)]")
+    parser.add_argument("-r", "--port_range", default=None, help="Range van poorten die gescand moeten worden (voorbeelde: 1,2,3; 10-30; 10,11,12-15 ) [poort scan]"),
+
+    
+    parser.add_argument("-c", "--cert", action="store_true", help="Certificate scan uitvoeren [Cert scan]")
+
+    args = parser.parse_args()
+
+    if args.ip_range:
+        if not args.subnetprefix:
+            message="Please fill in subnetprefix"
+            print(message)
+            return message
+        scan_ip_hosts(args.ip_range, args.subnetprefix)
+    if args.portscan:
+        if not args.target or not args.port_range:
+            message="Please fill in both target ip and port range"
+            print(message)
+            return message
+        scan_hosts_for_open_ports(args.target, args.port_range)
+    if args.cert:
+        if not args.target:
+            message="Please fill target domain name"
+            print(message)
+            return message
+        scan_domain_for_cert(args.target)
+
+if __name__ == "__main__":
+    main()

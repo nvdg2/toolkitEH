@@ -102,9 +102,9 @@ def log_results(results, folder, log_file, extra_info=""):
 
 def main():
     parser = argparse.ArgumentParser(description="Ethical hacking scans met Scapy")
-    parser.add_argument("-i", "--ip_range", help="IP-range [IO range scan]")
-    parser.add_argument("-p", "--portscan", action="store_true", help="Poortscan uitvoeren [Nmap scan]")
-    parser.add_argument("-t", "--target", help="Target ip adres of bestandsnaam [Nmap scan (ip), OS scan (ip), PCAP scan (bestandslocatie)]")
+    parser.add_argument("-i", "--ip_range", help="IP-range [IP range scan]")
+    parser.add_argument("-p", "--portscan", action="store_true", help="Poortscan uitvoeren [poort scan]")
+    parser.add_argument("-t", "--target", help="Target ip adres of bestandsnaam [poort scan (ip), OS scan (ip), PCAP scan (bestandslocatie)]")
     parser.add_argument("-o", "--os", action="store_true", help="OS-detectie scan uit [OS scan]")
     parser.add_argument("-a", "--analyze", help="Analyseer verkeer (HTTP, SMTP, POP3, IMAP) [PCAP scan]")
 
@@ -114,19 +114,23 @@ def main():
         hosts = arp_scan(args.ip_range)
         for host in hosts:
             print(f"Host gevonden: {host}")
+            exit(0)
 
     if args.target:
         if args.portscan:
             open_ports = port_scan(args.target)
             print(f"Open poorten: {open_ports}")
+            exit(0)
         
         if args.os:
             detected_os = os_detection(args.target)
             print(f"Besturingssysteem gedetecteerd: {detected_os}")
+            exit(0)
         
         if args.analyze:
             analysis_results = pcap_analysis(args.target, args.analyze)
             print(f"Analyseresultaten: {analysis_results}")
+            exit(0)
 
 if __name__ == "__main__":
     main()

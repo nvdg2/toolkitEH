@@ -104,11 +104,11 @@ def mitm(target_address, sslstrip_enabled, dns_spoof_enabled):
     disable_ip_routing()
 
 def main():
-    parser = argparse.ArgumentParser(description="Script for performing a man-in-the-middle (MITM) attack with SSL stripping.")
+    parser = argparse.ArgumentParser(description="Script om een Man in The Middle aanval uit te voeren.")
 
     parser.add_argument("target_ip", help="IP address of the target")
-    parser.add_argument("--sslstrip", action="store_true", help="Enable SSL stripping") # Tool doesn't work for now
-    parser.add_argument("--dnsspoof", action="store_true", help="Enable DNS spoofing") # Enebale dns spoofing
+    parser.add_argument("--sslstrip", action="store_true", help="SSL stripping activeren. WERKT NOG NIET") # Tool doesn't work for now
+    parser.add_argument("--dnsspoof", action="store_true", help="DNS spoofing vie dit script activeren. Standaard pad voor fake DNS records wordt gebruikt.")
     args = parser.parse_args()
     target_ip = args.target_ip
     sslstrip_enabled = args.sslstrip

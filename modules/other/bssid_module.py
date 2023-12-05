@@ -76,21 +76,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# flags = packet[Dot11].FCfield
-# Extract and print individual flag values
-# ds_status = flags & 0x3
-# more_fragments = (flags & 0x4) >> 2
-# retry = (flags & 0x8) >> 3
-# pwr_mgmt = (flags & 0x10) >> 4
-# more_data = (flags & 0x20) >> 5
-# protected_flag = (flags & 0x40) >> 6
-# htc_order_flag = (flags & 0x80) >> 7
-
-# print("DS Status:", ds_status)
-# print("More Fragments:", more_fragments)
-# print("Retry:", retry)
-# print("PWR MGT:", pwr_mgmt)
-# print("More Data:", more_data)
-# print("Protected Flag:", protected_flag)
-# print("+HTC/Order Flag:", htc_order_flag)

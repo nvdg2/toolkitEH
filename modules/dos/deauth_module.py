@@ -12,11 +12,11 @@ def access_point_dos(mac_address_gateway, mac_address_target, count, interface="
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Execute a Deauthentication attack on an access point.")
-    parser.add_argument("mac_address_access_point", help="MAC address of the access point (gateway)")
-    parser.add_argument("mac_address_target", help="MAC address of the target device")
-    parser.add_argument("count", type=int, help="Number of deauthentication packets to send")
-    parser.add_argument("--interface", default="wlo1", help="Name of the network interface to use (default: wlo1)")
+    parser = argparse.ArgumentParser(description="Een deauthenticatieaanval uitvoeren")
+    parser.add_argument("mac_address_access_point", help="MAC address van de access point (gateway)")
+    parser.add_argument("mac_address_target", help="MAC address van het toestel dat van het netwerk afgestoten moet worden")
+    parser.add_argument("count", type=int, help="Aantal pakketten die verzonden moeten worden")
+    parser.add_argument("--interface", default="wlo1", help="Naam van de interface (default: wlo1)")
 
     args = parser.parse_args()
     

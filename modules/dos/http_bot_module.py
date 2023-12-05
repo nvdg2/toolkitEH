@@ -35,9 +35,9 @@ def execute_http_dos(target_host,target_port):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Voer een DoS-aanval uit op een doelwit.")
-    parser.add_argument("target_host", help="Het IP-adres van het doelwit")
-    parser.add_argument("target_port", type=int, help="De poort van het doelwit")
+    parser = argparse.ArgumentParser(description="Voer een HTTP DoS-aanval uit op een webserver.")
+    parser.add_argument("target_host", help="Het IP-adres van de webserver")
+    parser.add_argument("target_port", type=int, help="De poort waar de webserver op draait")
 
     args = parser.parse_args()
 
