@@ -1,7 +1,12 @@
 import requests
 import argparse
+from datetime import datetime
+import json
+import pathlib
+import os
 
 def perform_wordlist_attack(target, list):
+    print(list)
     try:
         wordlist=read_list(f"resources/wordlists/{list}.txt")
     except:
@@ -31,7 +36,12 @@ def perform_wordlist_attack(target, list):
         print("The following urls were invalid:")
         for url in invalid_urls:
             print(url)
-    return found_urls
+    result={
+        "site":target,
+        "found_urls":found_urls
+    }
+    log_results(result)
+    return result
 
 def read_list(list_path):
     wordlist=[]
@@ -43,16 +53,22 @@ def read_list(list_path):
             wordlist.append(line.replace("\n",""))
     return wordlist
 
+def log_results(urls):
+    timestamp = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
+    xss_dir = pathlib.Path("logs/wordlist_attack")
+    xss_dir.mkdir(exist_ok=True,parents=True)
+    save_location=xss_dir/f"wordlist_attack_{timestamp}.json"
+    os.chown(xss_dir,1000,1000)
+    with save_location.open("w") as json_file_raw:
+        json.dump(urls, json_file_raw)
+
 def main():
     parser = argparse.ArgumentParser(description="Website wordlist attack")
     parser.add_argument("target", help="target url for wordlist attack")
     parser.add_argument("list", help="use the standard wordlist",choices=["standard", "swagger"])
     args = parser.parse_args()
-    match args.list:
-        case "standard":
-            perform_wordlist_attack(target=args.target, wordlist=args.list)
-        case "swagger":
-            perform_wordlist_attack(target=args.target, wordlist=args.list)
+    
+    perform_wordlist_attack(target=args.target, list=args.list)
 
 if __name__=="__main__":
     main()

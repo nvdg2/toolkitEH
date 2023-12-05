@@ -1,9 +1,5 @@
 # Script outputs
-/nmap
-/bssid_scans
-/scapy
-/aircrack-ng
-fake_dns_records.txt
+/logs
 
 # Pythen environment stuff
 /.venv
@@ -14,3 +10,6 @@ test.py
 test.txt
 sslstrip/
 .obsidian/
+
+# Other
+fake_dns_records.txt

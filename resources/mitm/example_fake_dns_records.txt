@@ -1,0 +1,3 @@
+# Rename this file to "fake_dns_records.txt" if the script should use it.
+
+www.bol.com:69.69.69.69
