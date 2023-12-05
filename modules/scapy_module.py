@@ -4,6 +4,8 @@ from scapy.layers.inet import IP, TCP, ICMP, UDP
 from scapy.layers.l2 import ARP
 import datetime
 import os
+import json
+
 # Functie om ARP-hostdetectie uit te voeren
 def arp_scan(ip_range):
     arp_request = scapy.ARP(pdst=ip_range)
@@ -16,7 +18,7 @@ def arp_scan(ip_range):
     for element in answered_list:
         host = {"ip": element[1].psrc, "mac": element[1].hwsrc}
         hosts.append(host)
-    log_results(hosts, "arp", "arp_scan", "ip_range")
+    log_results(hosts, "arp", "arp_scan", ip_range)
     return hosts
 
 # Functie om poortscans uit te voeren
@@ -42,14 +44,14 @@ def os_detection(target_ip):
     if response:
         if response.haslayer(scapy.ICMP):
             if response[scapy.ICMP].type == 0 and response[scapy.ICMP].code == 0:
-                log_results([f"Het doelsysteem op host {target_ip} lijkt een Unix-achtig besturingssysteem te gebruiken."], "OS", "os_scan")
+                log_results([f"Het doelsysteem op host {target_ip} lijkt een Unix-achtig besturingssysteem te gebruiken."], "OS", "os_scan", target_ip)
                 return "Het doelsysteem lijkt een Unix-achtig besturingssysteem te gebruiken."
             
             elif response[scapy.ICMP].type == 3 and response[scapy.ICMP].code in [1, 2, 3, 9, 10, 13]:
-                log_results([f"Het doelsysteem op host {target_ip} lijkt een Windows-besturingssysteem te gebruiken."], "OS", "os_scan")
+                log_results([f"Het doelsysteem op host {target_ip} lijkt een Windows-besturingssysteem te gebruiken."], "OS", "os_scan", target_ip)
                 return "Het doelsysteem lijkt een Windows-besturingssysteem te gebruiken."
             
-    log_results([f"Besturingssysteem op host {target_ip} kon niet worden geïdentificeerd."], "OS", "os_scan")
+    log_results([f"Besturingssysteem op host {target_ip} kon niet worden geïdentificeerd."], "OS", "os_scan", target_ip)
     return "Besturingssysteem kon niet worden geïdentificeerd."
     
 # Functie voor het analyseren van verkeer met behulp van pcap
@@ -74,36 +76,37 @@ def pcap_analysis(pcap_file, protocols):
 
             if "IMAP" in protocols and (src_port == 143 or dst_port == 143):
                 results["IMAP"] += 1
-    log_results(results, "pcap", "pcap_scan","pcap_file")
+    log_results(results, "pcap", "pcap_scan",pcap_file)
     return results
 
 def log_results(results, folder, log_file, extra_info=""):
-    filename=f"{log_file}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
+    filename=f"{log_file}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
     from pathlib import Path
-    doelmap = Path(f'scapy/{folder}')
+    doelmap = Path(f'logs/scapy/{folder}')
     doelmap.mkdir(parents=True, exist_ok=True)
+    os.chown("logs/scapy",1000,1000)
     os.chown(doelmap,1000,1000)
-    with open(f"{doelmap}/{filename}", "w") as file:
+    output={}
+    with open(f"{doelmap}/{filename}", "w") as json_file:
         match folder:
             case "OS":
-                file.write("Resultaat OS scan:\n")
+                output["message"]=f"Resultaat OS scan voor ip: {extra_info}"
             case "pcap":
-                file.write(f"Resultaat pcap scan op pcap file {extra_info}:\n")
+                output["message"]=f"Resultaat pcap scan op pcap file: {extra_info}"
             case "port":
-                file.write(f"Resultaat port scan op host {extra_info}:\n")
+                output["message"]=f"Resultaat port scan op host: {extra_info}"
             case "arp":
-                file.write(f"Resultaat arp scan op ip range {extra_info}:\n")
-        for result in results:
-            file.write(f"{result}\n")
+                output["message"]=f"Resultaat arp scan op ip range: {extra_info}"
+        output["results"]=results
+        json.dump(output, json_file)
 
 def main():
     parser = argparse.ArgumentParser(description="Ethical hacking scans met Scapy")
-    parser.add_argument("-i", "--ip_range", help="IP-range voor hostdetectie")
-    parser.add_argument("-t", "--target", help="Doel-IP-adres")
-    parser.add_argument("-p", "--ports", action="store_true", help="Poortscan uitvoeren")
-    parser.add_argument("-o", "--os", action="store_true", help="Voer OS-detectie uit")
-    parser.add_argument("-a", "--analyze", help="Analyseer verkeer (HTTP, SMTP, POP3, IMAP)")
-    parser.add_argument("-l", "--log", help="Logbestand voor resultaten")
+    parser.add_argument("-i", "--ip_range", help="IP-range [IO range scan]")
+    parser.add_argument("-p", "--portscan", action="store_true", help="Poortscan uitvoeren [Nmap scan]")
+    parser.add_argument("-t", "--target", help="Target ip adres of bestandsnaam [Nmap scan (ip), OS scan (ip), PCAP scan (bestandslocatie)]")
+    parser.add_argument("-o", "--os", action="store_true", help="OS-detectie scan uit [OS scan]")
+    parser.add_argument("-a", "--analyze", help="Analyseer verkeer (HTTP, SMTP, POP3, IMAP) [PCAP scan]")
 
     args = parser.parse_args()
 
@@ -113,7 +116,7 @@ def main():
             print(f"Host gevonden: {host}")
 
     if args.target:
-        if args.ports:
+        if args.portscan:
             open_ports = port_scan(args.target)
             print(f"Open poorten: {open_ports}")
         
