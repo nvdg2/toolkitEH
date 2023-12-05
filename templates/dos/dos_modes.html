@@ -12,21 +12,29 @@
         body {
             font-family: hacker;
             background-color: rgb(24, 26, 27);
-        }
-
-        .title {
-            font-size: 36px;
-            margin-top: 100px; /* Hiermee wordt de titel verticaal gecentreerd */
-            width: 100%;
-            text-align: center;
-            color: white;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .buttons {
-            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            width: 28rem;
+            justify-content: center;
+        }
+        .title {
+            display: block;
+            margin-top: 2rem;
+            margin-left: 100%;
+            margin-right: 100%;
+            font-size: 36px;
+            color: white;
+            justify-self: center;
         }
 
         .button {
+            align-self: center;
             padding: 10px 20px;
             font-size: 18px;
             background-color: rgb(255, 49, 49);

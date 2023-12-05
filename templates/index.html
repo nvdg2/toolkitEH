@@ -12,14 +12,19 @@
         body {
             font-family: hacker;
             background-color: rgb(24, 26, 27);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .title {
+            display: block;
+            margin-top: 2rem;
+            margin-left: 100%;
+            margin-right: 100%;
             font-size: 36px;
-            margin-top: 100px; /* Hiermee wordt de titel verticaal gecentreerd */
-            width: 100%;
-            text-align: center;
             color: white;
+            justify-self: center;
         }
 
         .buttons {
@@ -66,8 +71,8 @@
         <a href="{{url_for('scan.show_modes')}}" class="button">scans</a>
         <a href="{{url_for('mitm.mitm_attack')}}" class="button">MITM</a>
         <a href="{{url_for('injection.show_modes')}}" class="button">Web attacks</a>
-        <a href="{{url_for('other.show_modes')}}" class="button">Other</a>
         <a href="{{url_for('dos.show_modes')}}" class="button">DOS</a>
+        <a href="{{url_for('other.show_modes')}}" class="button">Other</a>
     </div>
 </body>
 </html>
