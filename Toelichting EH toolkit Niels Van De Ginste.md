@@ -1,5 +1,4 @@
 Github repository: [https://github.com/nvdg2/toolkitEH](https://github.com/nvdg2/toolkitEH)
-
 ## Inleiding
 
 Om kennis te maken met meerdere aspecten van pentesting, heb ik een tool gemaakt met een groot gamma aan verschillende scans en aanvallen. We spreken over de volgende functionaliteiten:
@@ -61,7 +60,6 @@ Hieronder vindt u opnieuw een matrix in verband met compatibiliteit, maar nu wan
 ## Benodigde derde partij software
 
 De onderstaande derde partij software moet geïnstalleerd zijn om mijn framework te kunnen gebruiken. Libnetfilter_queue en nmap moeten tevens geïnstalleerd zijn voordat een Python environment wordt aangemaakt.
-
 - Nmap (voor nmap scans)
 - Libnetfilter_queue (voor DNS spoofer)
 - Airmon-ng (voor alle modules die sniffing mode nodig hebben)
@@ -93,7 +91,6 @@ export FLASK_APP=.
 ```
 
 7. Start tot slot de applicatie via het volgende commando:
-
 ```bash
 flask run
 ```
